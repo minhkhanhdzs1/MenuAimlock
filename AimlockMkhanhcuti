@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aimlock Menu</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://i.imgur.com/lHHpN97.jpg') center/cover no-repeat fixed;
+      backdrop-filter: blur(5px);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      text-shadow: 0 0 8px #ff80ab;
+    }
+
+    .toggle-group {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+      max-width: 400px;
+      background-color: rgba(0,0,0,0.4);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px #ff4081aa;
+      backdrop-filter: blur(10px);
+    }
+
+    .toggle-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.1);
+      padding: 15px 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px #ff4081aa;
+      transition: transform 0.3s ease;
+    }
+
+    .toggle-container.active {
+      transform: scale(1.03);
+      box-shadow: 0 0 18px #f06292;
+    }
+
+    .toggle-container span {
+      font-size: 18px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 28px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0;
+      right: 0; bottom: 0;
+      background-color: #999;
+      transition: 0.4s;
+      border-radius: 28px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #ff4081;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(22px);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      animation: fadeInOut 2.5s ease-in-out;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateY(20px); }
+      10% { opacity: 1; transform: translateY(0); }
+      90% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(20px); }
+    }
+
+    .reset-btn {
+      margin-top: 25px;
+      background: #ff80ab;
+      color: white;
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #ff80abbb;
+    }
+
+    .reset-btn:hover {
+      background: #f06292;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🌸 Aimlock Menu</h1>
+
+  <div class="toggle-group">
+    <div class="toggle-container" id="group-aimlock">
+      <span>AimLock 😈</span>
+      <label class="switch">
+        <input type="checkbox" id="aimlock-toggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle-container" id="group-aimhead">
+      <span>AimHead 🤖</span>
+      <label class="switch">
+        <input type="checkbox" id="aimhead-toggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle-container" id="group-fixlag">
+      <span>FixLag 👾</span>
+      <label class="switch">
+        <input type="checkbox" id="fixlag-toggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <button class="reset-btn" onclick="resetAll()">🔁 Reset Trạng Thái</button>
+  </div>
+
+  <!-- Âm thanh -->
+  <audio id="sound-on" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_655e9cb5e6.mp3"></audio>
+  <audio id="sound-off" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_50cb8037b2.mp3"></audio>
+
+  <script>
+    const showToast = (message) => {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerText = message;
+      document.body.appendChild(toast);
+      setTimeout(() => { toast.remove(); }, 2500);
+    };
+
+    const toggles = [
+      { id: 'aimlock-toggle', group: 'group-aimlock', name: 'AimLock' },
+      { id: 'aimhead-toggle', group: 'group-aimhead', name: 'AimHead' },
+      { id: 'fixlag-toggle', group: 'group-fixlag', name: 'FixLag' }
+    ];
+
+    const soundOn = document.getElementById('sound-on');
+    const soundOff = document.getElementById('sound-off');
+
+    toggles.forEach(toggle => {
+      const checkbox = document.getElementById(toggle.id);
+      const container = document.getElementById(toggle.group);
+      const savedState = localStorage.getItem(toggle.id);
+      if (savedState === 'on') {
+        checkbox.checked = true;
+        container.classList.add('active');
+      }
+
+      checkbox.addEventListener('change', () => {
+        const state = checkbox.checked ? 'on' : 'off';
+        localStorage.setItem(toggle.id, state);
+        showToast(`${toggle.name} đã ${state === 'on' ? 'bật' : 'tắt'}`);
+
+        if (state === 'on') {
+          container.classList.add('active');
+          soundOn.currentTime = 0;
+          soundOn.play();
+        } else {
+          container.classList.remove('active');
+          soundOff.currentTime = 0;
+          soundOff.play();
+        }
+      });
+    });
+
+    function resetAll() {
+      if (confirm("Bạn có chắc muốn reset tất cả về mặc định không?")) {
+        toggles.forEach(toggle => {
+          localStorage.removeItem(toggle.id);
+          const checkbox = document.getElementById(toggle.id);
+          const container = document.getElementById(toggle.group);
+          checkbox.checked = false;
+          container.classList.remove('active');
+        });
+        showToast("🔁 Đã reset tất cả trạng thái.");
+      }
+    }
+  </script>
+</body>
+</html>
