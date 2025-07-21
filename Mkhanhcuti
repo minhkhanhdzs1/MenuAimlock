@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Menu AimLock</title>
+  <style>
+    body {
+      background: #121212;
+      color: #eee;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 30px;
+      font-weight: 700;
+      font-size: 2.2rem;
+      color: #ff3b3f;
+      text-shadow: 0 0 5px #ff3b3f;
+    }
+    .btn {
+      background: #333;
+      border: none;
+      border-radius: 12px;
+      padding: 15px 40px;
+      margin: 10px;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.6);
+      transition: background-color 0.3s ease, transform 0.15s ease, box-shadow 0.15s ease;
+      width: 220px;
+      text-align: center;
+      user-select: none;
+    }
+    .btn.on {
+      background: linear-gradient(45deg, #ff3b3f, #ff7a72);
+      box-shadow: 0 6px 12px rgba(255,59,63,0.9);
+      color: white;
+    }
+    .btn:hover {
+      transform: scale(1.05);
+    }
+    .btn:active {
+      transform: scale(0.95);
+    }
+    .footer {
+      margin-top: 40px;
+      font-size: 0.9rem;
+      color: #bbb;
+      font-style: italic;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Menu AimLock</h1>
+  <button id="btnAimLock" class="btn">AimLock: Tắt</button>
+  <button id="btnAimHead" class="btn">AimHead: Tắt</button>
+  <button id="btnFixLag" class="btn">FixLag: Tắt</button>
+  <div class="footer">Make by minhkhanhcuti💕</div>
+
+  <script>
+    // Các chức năng và trạng thái lưu trong localStorage
+    const features = [
+      { id: 'btnAimLock', name: 'AimLock' },
+      { id: 'btnAimHead', name: 'AimHead' },
+      { id: 'btnFixLag', name: 'FixLag' },
+    ];
+
+    function updateButton(btn, isOn, featureName) {
+      if (isOn) {
+        btn.classList.add('on');
+        btn.textContent = `${featureName}: Bật`;
+      } else {
+        btn.classList.remove('on');
+        btn.textContent = `${featureName}: Tắt`;
+      }
+    }
+
+    function toggleFeature(feature) {
+      const key = `feature_${feature.name}`;
+      const current = localStorage.getItem(key) === 'true';
+      const newState = !current;
+      localStorage.setItem(key, newState);
+      updateButton(document.getElementById(feature.id), newState, feature.name);
+
+      // TODO: Gửi lệnh bật/tắt thực tế ở đây nếu có API hoặc phương thức
+      // Ví dụ: callAPI(feature.name, newState);
+    }
+
+    // Khởi tạo trạng thái nút theo localStorage
+    features.forEach(feature => {
+      const btn = document.getElementById(feature.id);
+      const isOn = localStorage.getItem(`feature_${feature.name}`) === 'true';
+      updateButton(btn, isOn, feature.name);
+      btn.addEventListener('click', () => toggleFeature(feature));
+    });
+  </script>
+</body>
+</html>
